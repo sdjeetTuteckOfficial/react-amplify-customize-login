@@ -57,7 +57,6 @@ const LoginPage = () => {
       setError(err.message);
     } finally {
       setLoading(false);
-      //   window.location.reload();
     }
   };
 
@@ -85,8 +84,9 @@ const LoginPage = () => {
             />
 
             <Stack spacing={2}>
+              <Typography>User name</Typography>
               <TextField
-                label='Username'
+                // label='Username'
                 variant='outlined'
                 name='username'
                 value={formData.username}
@@ -96,8 +96,9 @@ const LoginPage = () => {
                 required
                 size='small'
               />
+              <Typography>Password</Typography>
               <TextField
-                label='Password'
+                // label='Password'
                 variant='outlined'
                 type='password'
                 name='password'

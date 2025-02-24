@@ -82,10 +82,10 @@ const SignUpPage = () => {
                 name='fake-username'
                 style={{ display: 'none' }}
               />
-
+              <Typography>User name</Typography>
               <TextField
                 name='username'
-                label='Username'
+                // label='Username'
                 fullWidth
                 margin='normal'
                 value={formData.username}
@@ -93,9 +93,10 @@ const SignUpPage = () => {
                 autoComplete='off'
                 size='small'
               />
+              <Typography>Password</Typography>
               <TextField
                 name='password'
-                label='Password'
+                // label='Password'
                 type='password'
                 fullWidth
                 margin='normal'
@@ -104,9 +105,10 @@ const SignUpPage = () => {
                 autoComplete='new-password'
                 size='small'
               />
+              <Typography>Confirm Password</Typography>
               <TextField
                 name='confirmPassword'
-                label='Confirm Password'
+                // label='Confirm Password'
                 type='password'
                 fullWidth
                 margin='normal'
