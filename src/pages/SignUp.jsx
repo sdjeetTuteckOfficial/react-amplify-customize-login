@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signUp } from 'aws-amplify/auth';
 import { useNavigate, Navigate } from 'react-router-dom';
 import {
@@ -20,17 +20,21 @@ const SignUpPage = () => {
   });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
   const { user } = useAuthenticator((context) => [context.user]);
+
+  useEffect(() => {
+    // Clear form fields on load
+    setFormData({ username: '', password: '', confirmPassword: '' });
+  }, []);
 
   if (user) {
     return <Navigate to='/dashboard' />;
   }
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -56,7 +60,7 @@ const SignUpPage = () => {
 
   return (
     <Container
-      maxWidth='sm'
+      maxWidth='xs'
       sx={{
         display: 'flex',
         justifyContent: 'center',
@@ -64,14 +68,21 @@ const SignUpPage = () => {
         alignItems: 'center',
       }}
     >
-      <Card sx={{ p: 4, width: '100%', boxShadow: 3 }}>
+      <Card sx={{ p: 1, width: '100%', boxShadow: 3 }} elevation={0}>
         <CardContent>
           <Typography variant='h4' align='center' gutterBottom>
             Sign Up
           </Typography>
 
           {!success && (
-            <form onSubmit={handleSignUp}>
+            <form onSubmit={handleSignUp} autoComplete='off'>
+              {/* Hidden autofill trick */}
+              <input
+                type='text'
+                name='fake-username'
+                style={{ display: 'none' }}
+              />
+
               <TextField
                 name='username'
                 label='Username'
@@ -79,6 +90,8 @@ const SignUpPage = () => {
                 margin='normal'
                 value={formData.username}
                 onChange={handleChange}
+                autoComplete='off'
+                size='small'
               />
               <TextField
                 name='password'
@@ -88,6 +101,8 @@ const SignUpPage = () => {
                 margin='normal'
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete='new-password'
+                size='small'
               />
               <TextField
                 name='confirmPassword'
@@ -97,6 +112,8 @@ const SignUpPage = () => {
                 margin='normal'
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                autoComplete='new-password'
+                size='small'
               />
               <Button
                 type='submit'
@@ -109,7 +126,12 @@ const SignUpPage = () => {
               </Button>
             </form>
           )}
-          <Typography onClick={() => navigate('/')} fullWidth sx={{ mt: 2 }}>
+          <Typography
+            variant='body2'
+            align='center'
+            sx={{ mt: 2, cursor: 'pointer', color: 'primary.main' }}
+            onClick={() => navigate('/')}
+          >
             Already a user? Sign in
           </Typography>
         </CardContent>

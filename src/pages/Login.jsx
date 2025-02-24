@@ -8,9 +8,9 @@ import {
   Button,
   Typography,
   Card,
-  CardContent,
-  Box,
+  Stack,
   Alert,
+  CardContent,
 } from '@mui/material';
 
 const LoginPage = () => {
@@ -41,7 +41,7 @@ const LoginPage = () => {
         response.isSignedIn === false &&
         response.nextStep.signInStep === 'CONFIRM_SIGN_UP'
       ) {
-        setError('User needs to be verified by an admin.');
+        setError('User needs to be verified by admin');
       }
       if (response.isSignedIn) {
         const user = await getCurrentUser();
@@ -56,44 +56,63 @@ const LoginPage = () => {
   };
 
   return (
-    <Container maxWidth='xs'>
-      <Card sx={{ mt: 8, p: 3, boxShadow: 3 }}>
+    <Container
+      maxWidth='xs'
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        alignItems: 'center',
+      }}
+    >
+      <Card sx={{ p: 1, width: '100%', boxShadow: 3 }} elevation={0}>
         <CardContent>
-          <Typography variant='h5' align='center' gutterBottom>
-            Login
+          <Typography variant='h4' align='center' gutterBottom>
+            Sign In
           </Typography>
+          <form onSubmit={handleLogin}>
+            {/* Hidden input to trick autofill */}
+            <input
+              type='text'
+              name='fake-username'
+              style={{ display: 'none' }}
+            />
 
-          <Box component='form' onSubmit={handleLogin} sx={{ mt: 2 }}>
-            <TextField
-              fullWidth
-              label='Username'
-              name='username'
-              value={formData.username}
-              onChange={handleChange}
-              required
-              margin='normal'
-            />
-            <TextField
-              fullWidth
-              label='Password'
-              type='password'
-              name='password'
-              value={formData.password}
-              onChange={handleChange}
-              required
-              margin='normal'
-            />
-            {error && <Alert severity='error'>{error}</Alert>}
-            <Button
-              type='submit'
-              fullWidth
-              variant='contained'
-              color='primary'
-              sx={{ mt: 2 }}
-            >
-              Login
-            </Button>
-          </Box>
+            <Stack spacing={2}>
+              <TextField
+                label='Username'
+                variant='outlined'
+                name='username'
+                value={formData.username}
+                onChange={handleChange}
+                autoComplete='username'
+                fullWidth
+                required
+                size='small'
+              />
+              <TextField
+                label='Password'
+                variant='outlined'
+                type='password'
+                name='password'
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete='new-password'
+                fullWidth
+                required
+                size='small'
+              />
+              <Button
+                type='submit'
+                variant='contained'
+                color='primary'
+                fullWidth
+              >
+                Login
+              </Button>
+              {error && <Alert severity='error'>{error}</Alert>}
+            </Stack>
+          </form>
 
           <Typography
             variant='body2'
@@ -101,7 +120,7 @@ const LoginPage = () => {
             sx={{ mt: 2, cursor: 'pointer', color: 'primary.main' }}
             onClick={() => navigate('/signup')}
           >
-            Not a user? Sign up
+            Not a user? Signup
           </Typography>
         </CardContent>
       </Card>
