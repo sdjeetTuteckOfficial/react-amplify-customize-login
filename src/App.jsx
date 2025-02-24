@@ -23,7 +23,7 @@ const ProtectedRoute = () => {
     return <div>Loading...</div>; // Show a loading state while auth is being set up
   }
 
-  return user ? <Outlet /> : <Navigate to='/' />;
+  return authStatus === 'authenticated' ? <Outlet /> : <Navigate to='/' />;
 };
 
 const App = () => {

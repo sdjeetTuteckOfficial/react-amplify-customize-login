@@ -15,6 +15,7 @@ import {
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { user } = useAuthenticator((context) => [context.user]);
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
     try {
       const response = await signIn({
@@ -46,13 +48,17 @@ const LoginPage = () => {
       if (response.isSignedIn) {
         const user = await getCurrentUser();
         console.log('user', user);
-        window.location.reload();
         navigate('/dashboard');
+        setLoading(false);
       }
     } catch (err) {
       console.log('err', err);
+      setLoading(false);
       setError(err.message);
     }
+    // finally {
+    //   window.location.reload();
+    // }
   };
 
   return (
@@ -107,8 +113,9 @@ const LoginPage = () => {
                 variant='contained'
                 color='primary'
                 fullWidth
+                loading={loading}
               >
-                Login
+                {loading ? 'Logging..' : 'Login'}
               </Button>
               {error && <Alert severity='error'>{error}</Alert>}
             </Stack>
