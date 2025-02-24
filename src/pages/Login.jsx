@@ -2,6 +2,16 @@ import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { signIn, getCurrentUser } from 'aws-amplify/auth';
 import { useAuthenticator } from '@aws-amplify/ui-react';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Card,
+  CardContent,
+  Box,
+  Alert,
+} from '@mui/material';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -31,7 +41,7 @@ const LoginPage = () => {
         response.isSignedIn === false &&
         response.nextStep.signInStep === 'CONFIRM_SIGN_UP'
       ) {
-        setError('User need to be verify by admin');
+        setError('User needs to be verified by an admin.');
       }
       if (response.isSignedIn) {
         const user = await getCurrentUser();
@@ -46,31 +56,56 @@ const LoginPage = () => {
   };
 
   return (
-    <div className='container text-center'>
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleLogin}>
-        <input
-          type='text'
-          name='username'
-          placeholder='Username'
-          value={formData.username}
-          onChange={handleChange}
-          required
-        />
-        <br />
-        <input
-          type='password'
-          name='password'
-          placeholder='Password'
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-        <br />
-        <button type='submit'>Login</button>
-      </form>
-    </div>
+    <Container maxWidth='xs'>
+      <Card sx={{ mt: 8, p: 3, boxShadow: 3 }}>
+        <CardContent>
+          <Typography variant='h5' align='center' gutterBottom>
+            Login
+          </Typography>
+
+          <Box component='form' onSubmit={handleLogin} sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              label='Username'
+              name='username'
+              value={formData.username}
+              onChange={handleChange}
+              required
+              margin='normal'
+            />
+            <TextField
+              fullWidth
+              label='Password'
+              type='password'
+              name='password'
+              value={formData.password}
+              onChange={handleChange}
+              required
+              margin='normal'
+            />
+            {error && <Alert severity='error'>{error}</Alert>}
+            <Button
+              type='submit'
+              fullWidth
+              variant='contained'
+              color='primary'
+              sx={{ mt: 2 }}
+            >
+              Login
+            </Button>
+          </Box>
+
+          <Typography
+            variant='body2'
+            align='center'
+            sx={{ mt: 2, cursor: 'pointer', color: 'primary.main' }}
+            onClick={() => navigate('/signup')}
+          >
+            Not a user? Sign up
+          </Typography>
+        </CardContent>
+      </Card>
+    </Container>
   );
 };
 
