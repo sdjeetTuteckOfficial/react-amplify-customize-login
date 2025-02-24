@@ -53,12 +53,12 @@ const LoginPage = () => {
       }
     } catch (err) {
       console.log('err', err);
-      setLoading(false);
+
       setError(err.message);
+    } finally {
+      setLoading(false);
+      //   window.location.reload();
     }
-    // finally {
-    //   window.location.reload();
-    // }
   };
 
   return (
