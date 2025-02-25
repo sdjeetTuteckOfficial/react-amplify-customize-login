@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { signUp } from 'aws-amplify/auth';
+import { signUp, confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
 import { useNavigate, Navigate } from 'react-router-dom';
 import {
   Container,
@@ -23,16 +23,18 @@ const SignUpPage = () => {
     username: '',
     password: '',
     confirmPassword: '',
+    otp: '',
   });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false); // Track OTP step
   const navigate = useNavigate();
   const { user } = useAuthenticator((context) => [context.user]);
 
   useEffect(() => {
-    setFormData({ username: '', password: '', confirmPassword: '' });
+    setFormData({ username: '', password: '', confirmPassword: '', otp: '' });
   }, []);
 
   if (user) {
@@ -58,8 +60,39 @@ const SignUpPage = () => {
         username: formData.username,
         password: formData.password,
       });
-      setSuccess('Sign-up successful! Please wait for admin confirmation.');
-      setFormData({ username: '', password: '', confirmPassword: '' });
+
+      setIsOtpSent(true); // Switch to OTP input
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleConfirmOtp = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await confirmSignUp({
+        username: formData.username,
+        confirmationCode: formData.otp,
+      });
+      setSuccess('Sign-up successful! Please check your email for the OTP.');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await resendSignUpCode({
+        username: formData.username,
+      });
+
+      setSuccess('OTP has been resent to your email.');
     } catch (err) {
       setError(err.message);
     }
@@ -78,10 +111,50 @@ const SignUpPage = () => {
       <Card sx={{ p: 1, width: '100%', boxShadow: 3 }} elevation={0}>
         <CardContent>
           <Typography variant='h4' align='center' gutterBottom>
-            Sign Up
+            {isOtpSent ? 'Verify OTP' : 'Sign Up'}
           </Typography>
 
-          {!success && (
+          {isOtpSent ? (
+            // OTP Verification Form
+            <form onSubmit={handleConfirmOtp} autoComplete='off'>
+              <Stack spacing={2}>
+                <FormControl fullWidth>
+                  <FormLabel>Enter OTP</FormLabel>
+                  <TextField
+                    name='otp'
+                    fullWidth
+                    value={formData.otp}
+                    onChange={handleChange}
+                    placeholder='Enter OTP'
+                    autoComplete='off'
+                    size='small'
+                    sx={{ mb: 1 }}
+                  />
+                </FormControl>
+
+                <Button
+                  type='submit'
+                  variant='contained'
+                  color='primary'
+                  fullWidth
+                  sx={{ fontWeight: 700 }}
+                >
+                  Verify OTP
+                </Button>
+
+                <Button
+                  variant='text'
+                  color='secondary'
+                  fullWidth
+                  onClick={handleResendOtp}
+                  sx={{ fontWeight: 700 }}
+                >
+                  Resend OTP
+                </Button>
+              </Stack>
+            </form>
+          ) : (
+            // Sign Up Form
             <form onSubmit={handleSignUp} autoComplete='off'>
               <Stack spacing={2}>
                 <FormControl fullWidth>
@@ -109,23 +182,17 @@ const SignUpPage = () => {
                     autoComplete='new-password'
                     size='small'
                     sx={{ mb: 1 }}
-                    slotProps={{
-                      input: {
-                        endAdornment: (
-                          <InputAdornment position='end'>
-                            <IconButton
-                              onClick={() => setShowPassword(!showPassword)}
-                              edge='end'
-                            >
-                              {showPassword ? (
-                                <VisibilityOff />
-                              ) : (
-                                <Visibility />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      },
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge='end'
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
                   />
                 </FormControl>
@@ -141,25 +208,23 @@ const SignUpPage = () => {
                     autoComplete='new-password'
                     size='small'
                     sx={{ mb: 1 }}
-                    slotProps={{
-                      input: {
-                        endAdornment: (
-                          <InputAdornment position='end'>
-                            <IconButton
-                              onClick={() =>
-                                setShowConfirmPassword(!showConfirmPassword)
-                              }
-                              edge='end'
-                            >
-                              {showConfirmPassword ? (
-                                <VisibilityOff />
-                              ) : (
-                                <Visibility />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      },
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
+                            edge='end'
+                          >
+                            {showConfirmPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
                     }}
                   />
                 </FormControl>
@@ -175,14 +240,16 @@ const SignUpPage = () => {
               </Stack>
             </form>
           )}
-          <Typography
-            variant='body2'
-            align='center'
-            sx={{ mt: 2, cursor: 'pointer', color: 'primary.main' }}
-            onClick={() => navigate('/')}
-          >
-            Already a user? Sign in
-          </Typography>
+          {!isOtpSent && (
+            <Typography
+              variant='body2'
+              align='center'
+              sx={{ mt: 2, cursor: 'pointer', color: 'primary.main' }}
+              onClick={() => navigate('/')}
+            >
+              Already a user? Sign in
+            </Typography>
+          )}
         </CardContent>
         {error && <Alert severity='error'>{error}</Alert>}
         {success && <Alert severity='success'>{success}</Alert>}
