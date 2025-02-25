@@ -11,12 +11,18 @@ import {
   Stack,
   Alert,
   CardContent,
+  FormControl,
+  FormLabel,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const { user } = useAuthenticator((context) => [context.user]);
   const navigate = useNavigate();
 
@@ -53,7 +59,6 @@ const LoginPage = () => {
       }
     } catch (err) {
       console.log('err', err);
-
       setError(err.message);
     } finally {
       setLoading(false);
@@ -76,47 +81,60 @@ const LoginPage = () => {
             Sign In
           </Typography>
           <form onSubmit={handleLogin}>
-            {/* Hidden input to trick autofill */}
-            <input
-              type='text'
-              name='fake-username'
-              style={{ display: 'none' }}
-            />
-
             <Stack spacing={2}>
-              <Typography>User name</Typography>
-              <TextField
-                // label='Username'
-                variant='outlined'
-                name='username'
-                value={formData.username}
-                onChange={handleChange}
-                autoComplete='username'
-                fullWidth
-                required
-                size='small'
-              />
-              <Typography>Password</Typography>
-              <TextField
-                // label='Password'
-                variant='outlined'
-                type='password'
-                name='password'
-                value={formData.password}
-                onChange={handleChange}
-                autoComplete='new-password'
-                fullWidth
-                required
-                size='small'
-              />
+              <FormControl fullWidth>
+                <FormLabel>Email</FormLabel>
+                <TextField
+                  variant='outlined'
+                  name='username'
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder='Enter your Email'
+                  autoComplete='username'
+                  fullWidth
+                  required
+                  size='small'
+                  sx={{ mb: 1 }}
+                />
+              </FormControl>
+              <FormControl fullWidth>
+                <FormLabel>Password</FormLabel>
+                <TextField
+                  variant='outlined'
+                  type={showPassword ? 'text' : 'password'}
+                  name='password'
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder='Enter your Password'
+                  autoComplete='new-password'
+                  fullWidth
+                  required
+                  size='small'
+                  sx={{ mb: 1 }}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge='end'
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+              </FormControl>
               <Button
                 type='submit'
                 variant='contained'
                 color='primary'
                 fullWidth
-                loading={loading}
+                disabled={loading}
               >
-                {loading ? 'Logging..' : 'Login'}
+                {loading ? 'Logging in...' : 'Login'}
               </Button>
               {error && <Alert severity='error'>{error}</Alert>}
             </Stack>

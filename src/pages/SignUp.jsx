@@ -2,15 +2,21 @@ import { useState, useEffect } from 'react';
 import { signUp } from 'aws-amplify/auth';
 import { useNavigate, Navigate } from 'react-router-dom';
 import {
+  Container,
   TextField,
   Button,
-  Container,
   Typography,
   Card,
   CardContent,
   Alert,
+  FormControl,
+  FormLabel,
+  Stack,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
 import { useAuthenticator } from '@aws-amplify/ui-react';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -20,11 +26,12 @@ const SignUpPage = () => {
   });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuthenticator((context) => [context.user]);
 
   useEffect(() => {
-    // Clear form fields on load
     setFormData({ username: '', password: '', confirmPassword: '' });
   }, []);
 
@@ -76,56 +83,96 @@ const SignUpPage = () => {
 
           {!success && (
             <form onSubmit={handleSignUp} autoComplete='off'>
-              {/* Hidden autofill trick */}
-              <input
-                type='text'
-                name='fake-username'
-                style={{ display: 'none' }}
-              />
-              <Typography>User name</Typography>
-              <TextField
-                name='username'
-                // label='Username'
-                fullWidth
-                margin='normal'
-                value={formData.username}
-                onChange={handleChange}
-                autoComplete='off'
-                size='small'
-              />
-              <Typography>Password</Typography>
-              <TextField
-                name='password'
-                // label='Password'
-                type='password'
-                fullWidth
-                margin='normal'
-                value={formData.password}
-                onChange={handleChange}
-                autoComplete='new-password'
-                size='small'
-              />
-              <Typography>Confirm Password</Typography>
-              <TextField
-                name='confirmPassword'
-                // label='Confirm Password'
-                type='password'
-                fullWidth
-                margin='normal'
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                autoComplete='new-password'
-                size='small'
-              />
-              <Button
-                type='submit'
-                variant='contained'
-                color='primary'
-                fullWidth
-                sx={{ mt: 2 }}
-              >
-                Sign Up
-              </Button>
+              <Stack spacing={2}>
+                <FormControl fullWidth>
+                  <FormLabel>Email</FormLabel>
+                  <TextField
+                    name='username'
+                    fullWidth
+                    value={formData.username}
+                    onChange={handleChange}
+                    placeholder='Enter your Email'
+                    autoComplete='off'
+                    size='small'
+                    sx={{ mb: 1 }}
+                  />
+                </FormControl>
+                <FormControl fullWidth>
+                  <FormLabel>Password</FormLabel>
+                  <TextField
+                    name='password'
+                    type={showPassword ? 'text' : 'password'}
+                    fullWidth
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder='Enter your Password'
+                    autoComplete='new-password'
+                    size='small'
+                    sx={{ mb: 1 }}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge='end'
+                            >
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+                </FormControl>
+                <FormControl fullWidth>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <TextField
+                    name='confirmPassword'
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    fullWidth
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder='Please confirm your Password'
+                    autoComplete='new-password'
+                    size='small'
+                    sx={{ mb: 1 }}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton
+                              onClick={() =>
+                                setShowConfirmPassword(!showConfirmPassword)
+                              }
+                              edge='end'
+                            >
+                              {showConfirmPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+                </FormControl>
+                <Button
+                  type='submit'
+                  variant='contained'
+                  color='primary'
+                  fullWidth
+                  sx={{ fontWeight: 700 }}
+                >
+                  Sign Up
+                </Button>
+              </Stack>
             </form>
           )}
           <Typography
