@@ -30,6 +30,7 @@ const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false); // Track OTP step
+  const [otpValidate, setOtpValidate] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuthenticator((context) => [context.user]);
 
@@ -77,7 +78,7 @@ const SignUpPage = () => {
         username: formData.username,
         confirmationCode: formData.otp,
       });
-      setSuccess('Sign-up successful! Please wait for admin approval!');
+      setOtpValidate(true);
     } catch (err) {
       setError(err.message);
     }
@@ -110,145 +111,160 @@ const SignUpPage = () => {
     >
       <Card sx={{ p: 1, width: '100%', boxShadow: 3 }} elevation={0}>
         <CardContent>
-          <Typography variant='h4' align='center' gutterBottom>
-            {isOtpSent ? 'Verify OTP' : 'Sign Up'}
-          </Typography>
-
-          {isOtpSent ? (
-            // OTP Verification Form
-            <form onSubmit={handleConfirmOtp} autoComplete='off'>
-              <Stack spacing={2}>
-                <FormControl fullWidth>
-                  <FormLabel>Enter OTP</FormLabel>
-                  <TextField
-                    name='otp'
-                    fullWidth
-                    value={formData.otp}
-                    onChange={handleChange}
-                    placeholder='Enter OTP'
-                    autoComplete='off'
-                    size='small'
-                    sx={{ mb: 1 }}
-                  />
-                </FormControl>
-
-                <Button
-                  type='submit'
-                  variant='contained'
-                  color='primary'
-                  fullWidth
-                  sx={{ fontWeight: 700 }}
-                >
-                  Verify OTP
-                </Button>
-
-                <Button
-                  variant='text'
-                  color='secondary'
-                  fullWidth
-                  onClick={handleResendOtp}
-                  sx={{ fontWeight: 700 }}
-                >
-                  Resend OTP
-                </Button>
-              </Stack>
-            </form>
+          {otpValidate ? (
+            <>
+              <Alert severity='success'>
+                You have successfully verified. Please wait for admin Approval
+              </Alert>
+              <Typography
+                variant='body2'
+                align='center'
+                sx={{ mt: 2, cursor: 'pointer', color: 'primary.main' }}
+                onClick={() => navigate('/')}
+              >
+                Back to Login
+              </Typography>
+            </>
           ) : (
-            // Sign Up Form
-            <form onSubmit={handleSignUp} autoComplete='off'>
-              <Stack spacing={2}>
-                <FormControl fullWidth>
-                  <FormLabel>Email</FormLabel>
-                  <TextField
-                    name='username'
-                    fullWidth
-                    value={formData.username}
-                    onChange={handleChange}
-                    placeholder='Enter your Email'
-                    autoComplete='off'
-                    size='small'
-                    sx={{ mb: 1 }}
-                  />
-                </FormControl>
-                <FormControl fullWidth>
-                  <FormLabel>Password</FormLabel>
-                  <TextField
-                    name='password'
-                    type={showPassword ? 'text' : 'password'}
-                    fullWidth
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder='Enter your Password'
-                    autoComplete='new-password'
-                    size='small'
-                    sx={{ mb: 1 }}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <IconButton
-                            onClick={() => setShowPassword(!showPassword)}
-                            edge='end'
-                          >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </FormControl>
-                <FormControl fullWidth>
-                  <FormLabel>Confirm Password</FormLabel>
-                  <TextField
-                    name='confirmPassword'
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    fullWidth
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder='Please confirm your Password'
-                    autoComplete='new-password'
-                    size='small'
-                    sx={{ mb: 1 }}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <IconButton
-                            onClick={() =>
-                              setShowConfirmPassword(!showConfirmPassword)
-                            }
-                            edge='end'
-                          >
-                            {showConfirmPassword ? (
-                              <VisibilityOff />
-                            ) : (
-                              <Visibility />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </FormControl>
-                <Button
-                  type='submit'
-                  variant='contained'
-                  color='primary'
-                  fullWidth
-                  sx={{ fontWeight: 700 }}
-                >
-                  Sign Up
-                </Button>
-              </Stack>
-            </form>
-          )}
-          {!isOtpSent && (
-            <Typography
-              variant='body2'
-              align='center'
-              sx={{ mt: 2, cursor: 'pointer', color: 'primary.main' }}
-              onClick={() => navigate('/')}
-            >
-              Already a user? Sign in
-            </Typography>
+            <>
+              <Typography variant='h4' align='center' gutterBottom>
+                {isOtpSent ? 'Verify OTP' : 'Sign Up'}
+              </Typography>
+              {isOtpSent ? (
+                <form onSubmit={handleConfirmOtp} autoComplete='off'>
+                  <Stack spacing={2}>
+                    <FormControl fullWidth>
+                      <FormLabel>Enter OTP</FormLabel>
+                      <TextField
+                        name='otp'
+                        fullWidth
+                        value={formData.otp}
+                        onChange={handleChange}
+                        placeholder='Enter OTP'
+                        autoComplete='off'
+                        size='small'
+                        sx={{ mb: 1 }}
+                      />
+                    </FormControl>
+                    <Button
+                      type='submit'
+                      variant='contained'
+                      color='primary'
+                      fullWidth
+                      sx={{ fontWeight: 700 }}
+                    >
+                      Verify OTP
+                    </Button>
+                    <Button
+                      variant='text'
+                      color='secondary'
+                      fullWidth
+                      onClick={handleResendOtp}
+                      sx={{ fontWeight: 700 }}
+                    >
+                      Resend OTP
+                    </Button>
+                  </Stack>
+                </form>
+              ) : (
+                <form onSubmit={handleSignUp} autoComplete='off'>
+                  <Stack spacing={2}>
+                    <FormControl fullWidth>
+                      <FormLabel>Email</FormLabel>
+                      <TextField
+                        name='username'
+                        fullWidth
+                        value={formData.username}
+                        onChange={handleChange}
+                        placeholder='Enter your Email'
+                        autoComplete='off'
+                        size='small'
+                        sx={{ mb: 1 }}
+                      />
+                    </FormControl>
+                    <FormControl fullWidth>
+                      <FormLabel>Password</FormLabel>
+                      <TextField
+                        name='password'
+                        type={showPassword ? 'text' : 'password'}
+                        fullWidth
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder='Enter your Password'
+                        autoComplete='new-password'
+                        size='small'
+                        sx={{ mb: 1 }}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <IconButton
+                                onClick={() => setShowPassword(!showPassword)}
+                                edge='end'
+                              >
+                                {showPassword ? (
+                                  <VisibilityOff />
+                                ) : (
+                                  <Visibility />
+                                )}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </FormControl>
+                    <FormControl fullWidth>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <TextField
+                        name='confirmPassword'
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        fullWidth
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        placeholder='Please confirm your Password'
+                        autoComplete='new-password'
+                        size='small'
+                        sx={{ mb: 1 }}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position='end'>
+                              <IconButton
+                                onClick={() =>
+                                  setShowConfirmPassword(!showConfirmPassword)
+                                }
+                                edge='end'
+                              >
+                                {showConfirmPassword ? (
+                                  <VisibilityOff />
+                                ) : (
+                                  <Visibility />
+                                )}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </FormControl>
+                    <Button
+                      type='submit'
+                      variant='contained'
+                      color='primary'
+                      fullWidth
+                      sx={{ fontWeight: 700 }}
+                    >
+                      Sign Up
+                    </Button>
+                  </Stack>
+                </form>
+              )}
+              <Typography
+                variant='body2'
+                align='center'
+                sx={{ mt: 2, cursor: 'pointer', color: 'primary.main' }}
+                onClick={() => navigate('/')}
+              >
+                Already a user? Sign in
+              </Typography>
+            </>
           )}
         </CardContent>
         {error && <Alert severity='error'>{error}</Alert>}
