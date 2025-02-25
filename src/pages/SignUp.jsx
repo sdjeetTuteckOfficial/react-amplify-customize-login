@@ -77,7 +77,7 @@ const SignUpPage = () => {
         username: formData.username,
         confirmationCode: formData.otp,
       });
-      setSuccess('Sign-up successful! Please check your email for the OTP.');
+      setSuccess('Sign-up successful! Please wait for admin approval!');
     } catch (err) {
       setError(err.message);
     }
